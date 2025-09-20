@@ -1,1 +1,1326 @@
+-- Single Line Comment
 
+/* 
+Multi 
+Line 
+Comment
+*/
+
+-- Table: Personnel
+-- 1. Select all personnel with blood group 'B+'
+SELECT * FROM Personnel
+WHERE blood_group = 'B+';
+
+-- 2. Select name and post of personnel commissioned after 2000
+SELECT full_name, post FROM Personnel
+WHERE date_of_commission > '2000-01-01';
+
+-- 3. Select personnel whose email is from 'navy.mil'
+SELECT * FROM Personnel
+WHERE email_address LIKE '%@navy.mil';
+
+-- 4. Select count of personnel by post (group by)
+SELECT post, COUNT(*) AS num_personnel FROM Personnel
+GROUP BY post;
+
+-- 5. Select personnel details joined with base name of current posting
+SELECT p.full_name, b.base_name
+FROM Personnel p
+JOIN Bases b ON p.current_posting_id = b.base_id;
+
+-- Rename queries for Personnel:
+-- 1. Rename column contact_number to phone_number
+ALTER TABLE Personnel RENAME COLUMN contact_number TO phone_number;
+
+-- 2. Rename column email_address to email
+ALTER TABLE Personnel RENAME COLUMN email_address TO email;
+
+-- 3. Rename column current_posting_id to base_posting_id
+ALTER TABLE Personnel RENAME COLUMN current_posting_id TO base_posting_id;
+
+-- 4. Rename column service_number to service_no
+ALTER TABLE Personnel RENAME COLUMN service_number TO service_no;
+
+-- 5. Rename column full_name to name
+ALTER TABLE Personnel RENAME COLUMN full_name TO name;
+
+-- Alter queries for Personnel:
+-- 1. Add column rank_years (years of service rank)
+ALTER TABLE Personnel ADD COLUMN rank_years INT;
+
+-- 2. Drop column blood_group
+ALTER TABLE Personnel DROP COLUMN blood_group;
+
+-- 3. Modify phone_number column length
+ALTER TABLE Personnel MODIFY phone_number VARCHAR(20);
+
+-- 4. Add foreign key for base_posting_id to Bases
+ALTER TABLE Personnel ADD CONSTRAINT fk_personnel_base
+    FOREIGN KEY (base_posting_id) REFERENCES Bases(base_id);
+
+-- 5. Add column is_active with default TRUE
+ALTER TABLE Personnel ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
+
+-- Delete queries for Personnel:
+-- 1. Delete personnel with post 'Captain' commissioned before 2000
+DELETE FROM Personnel
+WHERE post = 'Captain' AND date_of_commission < '2000-01-01';
+
+-- 2. Delete personnel with no phone number (NULL after rename)
+DELETE FROM Personnel
+WHERE phone_number IS NULL;
+
+-- 3. Delete personnel by a specific service number
+DELETE FROM Personnel
+WHERE service_no = 'IN010';
+
+-- 4. Delete personnel of rank 'Lieutenant' at a certain base
+DELETE FROM Personnel
+WHERE post = 'Lieutenant' AND base_posting_id = 5;
+
+-- 5. Delete personnel commissioned before 1985
+DELETE FROM Personnel
+WHERE date_of_commission < '1985-01-01';
+
+-- Update queries for Personnel:
+-- 1. Update phone number for Admiral
+UPDATE Personnel
+SET phone_number = '9999999999'
+WHERE post = 'Admiral';
+
+-- 2. Update base_posting_id for Seaman II
+UPDATE Personnel
+SET base_posting_id = 8
+WHERE service_no = 'IN014';
+
+-- 3. Update post to include '(Retired)' for oldest personnel
+UPDATE Personnel
+SET post = CONCAT(post, ' (Retired)')
+WHERE date_of_birth < '1965-01-01';
+
+-- 4. Update email domain for all entries to '@navy.gov.in'
+UPDATE Personnel
+SET email = CONCAT(SUBSTRING_INDEX(email, '@', 1), '@navy.gov.in')
+WHERE email LIKE '%@navy.mil';
+
+-- 5. Mark all personnel as active (TRUE) if name is not null
+UPDATE Personnel
+SET is_active = TRUE
+WHERE name IS NOT NULL;
+
+
+-- Table: Ships
+-- 1. Select all active destroyers
+SELECT * FROM Ships
+WHERE ship_type = 'Destroyer' AND current_status = 'Active';
+
+-- 2. Select ships commissioned between 2000 and 2020
+SELECT ship_name, commission_date FROM Ships
+WHERE commission_date BETWEEN '2000-01-01' AND '2020-12-31';
+
+-- 3. Select count of ships by class
+SELECT ship_class, COUNT(*) AS num_ships FROM Ships
+GROUP BY ship_class;
+
+-- 4. Select ships and their home base name by join with Bases
+SELECT s.ship_name, b.base_name FROM Ships s
+JOIN Bases b ON s.home_port_id = b.base_id
+WHERE s.current_status = 'Active';
+
+-- 5. Select ships without a commanding officer assigned
+SELECT ship_name FROM Ships
+WHERE commanding_officer_id IS NULL;
+
+-- Rename queries for Ships:
+-- 1. Rename column ship_class to class
+ALTER TABLE Ships RENAME COLUMN ship_class TO class;
+
+-- 2. Rename column home_port_id to home_base_id
+ALTER TABLE Ships RENAME COLUMN home_port_id TO home_base_id;
+
+-- 3. Rename column current_status to status
+ALTER TABLE Ships RENAME COLUMN current_status TO status;
+
+-- 4. Rename column commanding_officer_id to co_id
+ALTER TABLE Ships RENAME COLUMN commanding_officer_id TO co_id;
+
+-- 5. Rename column pennant_number to pennant_no
+ALTER TABLE Ships RENAME COLUMN pennant_number TO pennant_no;
+
+-- Alter queries for Ships:
+-- 1. Add column displacement_tons
+ALTER TABLE Ships ADD COLUMN displacement_tons INT;
+
+-- 2. Drop column ship_type
+ALTER TABLE Ships DROP COLUMN ship_type;
+
+-- 3. Modify ship_name length
+ALTER TABLE Ships MODIFY ship_name VARCHAR(150);
+
+-- 4. Add foreign key for co_id to Personnel
+ALTER TABLE Ships ADD CONSTRAINT fk_ships_co
+    FOREIGN KEY (co_id) REFERENCES Personnel(personnel_id);
+
+-- 5. Add column refit_due_year
+ALTER TABLE Ships ADD COLUMN refit_due_year YEAR;
+
+-- Delete queries for Ships:
+-- 1. Delete ships decommissioned before 1990
+DELETE FROM Ships
+WHERE decommission_date IS NOT NULL AND decommission_date < '1990-01-01';
+
+-- 2. Delete all patrol vessels (class contains 'Patrol')
+DELETE FROM Ships
+WHERE class LIKE '%Patrol%';
+
+-- 3. Delete ship by name 'INS Sahyadri'
+DELETE FROM Ships
+WHERE ship_name = 'INS Sahyadri';
+
+-- 4. Delete ships with no home base assigned
+DELETE FROM Ships
+WHERE home_base_id IS NULL;
+
+-- 5. Delete ships whose name starts with 'INS K'
+DELETE FROM Ships
+WHERE ship_name LIKE 'INS K%';
+
+-- Update queries for Ships:
+-- 1. Update status of ships past decommission date
+UPDATE Ships
+SET status = 'Decommissioned'
+WHERE decommission_date < CURDATE();
+
+-- 2. Update commanding officer for INS Kochi
+UPDATE Ships
+SET co_id = 8
+WHERE ship_name = 'INS Kochi';
+
+-- 3. Increase displacement for carriers by 1000
+UPDATE Ships
+SET displacement_tons = displacement_tons + 1000
+WHERE class LIKE '%Aircraft Carrier%';
+
+-- 4. Set refit_due_year to 2025 for active destroyers
+UPDATE Ships
+SET refit_due_year = 2025
+WHERE class LIKE '%Destroyer%' AND status = 'Active';
+
+-- 5. Change home_base_id of INS Jalashwa to 2
+UPDATE Ships
+SET home_base_id = 2
+WHERE ship_name = 'INS Jalashwa';
+
+
+-- Table: Bases
+-- 1. Select all bases in 'Kerala'
+SELECT * FROM Bases
+WHERE location_state = 'Kerala';
+
+-- 2. Select base names and capacity where capacity > 20000
+SELECT base_name, capacity FROM Bases
+WHERE capacity > 20000;
+
+-- 3. Select count of bases per command
+SELECT command, COUNT(*) AS num_bases FROM Bases
+GROUP BY command;
+
+-- 4. Select bases established before 1950
+SELECT base_name, establishment_date FROM Bases
+WHERE establishment_date < '1950-01-01';
+
+-- 5. Select base names and coordinates for Naval Bases
+SELECT base_name, latitude, longitude FROM Bases
+WHERE base_type = 'Naval Base';
+
+-- Rename queries for Bases:
+-- 1. Rename column location_city to city
+ALTER TABLE Bases RENAME COLUMN location_city TO city;
+
+-- 2. Rename column location_state to state
+ALTER TABLE Bases RENAME COLUMN location_state TO state;
+
+-- 3. Rename column base_type to type
+ALTER TABLE Bases RENAME COLUMN base_type TO type;
+
+-- 4. Rename column establishment_date to est_date
+ALTER TABLE Bases RENAME COLUMN establishment_date TO est_date;
+
+-- 5. Rename column capacity to max_capacity
+ALTER TABLE Bases RENAME COLUMN capacity TO max_capacity;
+
+-- Alter queries for Bases:
+-- 1. Add column commander_in_charge
+ALTER TABLE Bases ADD COLUMN commander_in_charge VARCHAR(100);
+
+-- 2. Drop column latitude
+ALTER TABLE Bases DROP COLUMN latitude;
+
+-- 3. Modify base_name to length 150
+ALTER TABLE Bases MODIFY base_name VARCHAR(150);
+
+-- 4. Add column region
+ALTER TABLE Bases ADD COLUMN region VARCHAR(100);
+
+-- 5. Add UNIQUE constraint on (city, state)
+ALTER TABLE Bases ADD UNIQUE (city, state);
+
+-- Delete queries for Bases:
+-- 1. Delete bases with capacity less than 5000
+DELETE FROM Bases
+WHERE max_capacity < 5000;
+
+-- 2. Delete all Air Stations
+DELETE FROM Bases
+WHERE type = 'Air Station';
+
+-- 3. Delete base by name 'INS Adyar'
+DELETE FROM Bases
+WHERE base_name = 'INS Adyar';
+
+-- 4. Delete bases in 'Goa'
+DELETE FROM Bases
+WHERE city = 'Vasco da Gama';
+
+-- 5. Delete bases established after 2010
+DELETE FROM Bases
+WHERE est_date > '2010-01-01';
+
+-- Update queries for Bases:
+-- 1. Update capacity for Dockyards by adding 5000
+UPDATE Bases
+SET max_capacity = max_capacity + 5000
+WHERE type = 'Dockyard';
+
+-- 2. Update state for 'Naval Dockyard, Mumbai'
+UPDATE Bases
+SET state = 'Maharashtra'
+WHERE base_name = 'Naval Dockyard, Mumbai';
+
+-- 3. Update all Naval Base type to 'Naval Facility'
+UPDATE Bases
+SET type = 'Naval Facility'
+WHERE type = 'Naval Base';
+
+-- 4. Change name of 'Material Organisation, Mumbai'
+UPDATE Bases
+SET base_name = 'INS Mumbai MO'
+WHERE base_name LIKE '%Material Organisation%';
+
+-- 5. Set region to 'Western Coast' for all bases in Gujarat
+UPDATE Bases
+SET region = 'Western Coast'
+WHERE state = 'Gujarat';
+
+
+-- Table: Aircraft
+-- 1. Select all MiG-29K fighter aircraft
+SELECT * FROM Aircraft
+WHERE model_name = 'MiG-29K' AND aircraft_type = 'Fighter';
+
+-- 2. Select aircraft with airframe hours > 5000
+SELECT tail_number, airframe_hours FROM Aircraft
+WHERE airframe_hours > 5000;
+
+-- 3. Select count of aircraft by status
+SELECT current_status, COUNT(*) AS count_ac FROM Aircraft
+GROUP BY current_status;
+
+-- 4. Select all aircraft stationed at Base 7 (INS Kadamba)
+SELECT tail_number, model_name FROM Aircraft
+WHERE base_id = 7;
+
+-- 5. Select aircraft that have been serviced in 2025
+SELECT tail_number, last_serviced_date FROM Aircraft
+WHERE YEAR(last_serviced_date) = 2025;
+
+-- Rename queries for Aircraft:
+-- 1. Rename aircraft_type to type
+ALTER TABLE Aircraft RENAME COLUMN aircraft_type TO type;
+
+-- 2. Rename model_name to model
+ALTER TABLE Aircraft RENAME COLUMN model_name TO model;
+
+-- 3. Rename last_serviced_date to serviced_date
+ALTER TABLE Aircraft RENAME COLUMN last_serviced_date TO serviced_date;
+
+-- 4. Rename airframe_hours to hours
+ALTER TABLE Aircraft RENAME COLUMN airframe_hours TO hours;
+
+-- 5. Rename tail_number to tail_no
+ALTER TABLE Aircraft RENAME COLUMN tail_number TO tail_no;
+
+-- Alter queries for Aircraft:
+-- 1. Add column squadron_leader_id
+ALTER TABLE Aircraft ADD COLUMN squadron_leader_id INT;
+
+-- 2. (No column to drop safely in this context)
+
+-- 3. Modify model length
+ALTER TABLE Aircraft MODIFY model VARCHAR(150);
+
+-- 4. Add column maintenance_due_date
+ALTER TABLE Aircraft ADD COLUMN maintenance_due_date DATE;
+
+-- 5. Add foreign key squadron_id to Squadrons
+ALTER TABLE Aircraft ADD CONSTRAINT fk_air_squadron
+    FOREIGN KEY (squadron_id) REFERENCES Squadrons(squadron_id);
+
+-- Delete queries for Aircraft:
+-- 1. Delete decommissioned aircraft
+DELETE FROM Aircraft
+WHERE status = 'Decommissioned';
+
+-- 2. Delete all stored aircraft from Squadron 4
+DELETE FROM Aircraft
+WHERE squadron_id = 4 AND status = 'Stored';
+
+-- 3. Delete aircraft last serviced before 2020
+DELETE FROM Aircraft
+WHERE serviced_date < '2020-01-01';
+
+-- 4. Delete aircraft by tail number
+DELETE FROM Aircraft
+WHERE tail_no = 'INAS300-01';
+
+-- 5. Delete any aircraft with null base_id
+DELETE FROM Aircraft
+WHERE base_id IS NULL;
+
+-- Update queries for Aircraft:
+-- 1. Update status to 'Operational' for aircraft serviced in July 2025
+UPDATE Aircraft
+SET status = 'Operational'
+WHERE serviced_date >= '2025-07-01';
+
+-- 2. Update model to include version for IAI Heron
+UPDATE Aircraft
+SET model = CONCAT(model, ' Mk.II')
+WHERE model = 'IAI Heron';
+
+-- 3. Increment hours by 100 for all helicopters
+UPDATE Aircraft
+SET hours = hours + 100
+WHERE type LIKE '%Helicopter%';
+
+-- 4. Assign squadron_id 5 to HAL Kiran aircraft missing squadron
+UPDATE Aircraft
+SET squadron_id = 5
+WHERE model LIKE '%HAL Kiran%' AND squadron_id IS NULL;
+
+-- 5. Change base for aircraft INAS323-01 to 4
+UPDATE Aircraft
+SET base_id = 4
+WHERE tail_no = 'INAS323-01';
+
+
+-- Table: Squadrons
+-- 1. Select squadrons with role containing 'Anti-Submarine'
+SELECT * FROM Squadrons
+WHERE role LIKE '%Anti-Submarine%';
+
+-- 2. Select squadron names and total aircraft > 10
+SELECT squadron_name, total_aircraft FROM Squadrons
+WHERE total_aircraft > 10;
+
+-- 3. Count squadrons by base_id
+SELECT base_id, COUNT(*) AS squadron_count FROM Squadrons
+GROUP BY base_id;
+
+-- 4. Select squadrons established after 2000
+SELECT squadron_name, establishment_date FROM Squadrons
+WHERE establishment_date > '2000-01-01';
+
+-- 5. Select squadron names with their commanding officers
+SELECT s.squadron_name, p.full_name AS commander_name
+FROM Squadrons s
+LEFT JOIN Personnel p ON s.commanding_officer_id = p.personnel_id;
+
+-- Rename queries for Squadrons:
+-- 1. Rename squadron_name to name
+ALTER TABLE Squadrons RENAME COLUMN squadron_name TO name;
+
+-- 2. Rename aircraft_type_specialization to specialization
+ALTER TABLE Squadrons RENAME COLUMN aircraft_type_specialization TO specialization;
+
+-- 3. Rename establishment_date to date_established
+ALTER TABLE Squadrons RENAME COLUMN establishment_date TO date_established;
+
+-- 4. Rename total_aircraft to aircraft_count
+ALTER TABLE Squadrons RENAME COLUMN total_aircraft TO aircraft_count;
+
+-- 5. Rename commanding_officer_id to co_id
+ALTER TABLE Squadrons RENAME COLUMN commanding_officer_id TO co_id;
+
+-- Alter queries for Squadrons:
+-- 1. Add column squadron_motto
+ALTER TABLE Squadrons ADD COLUMN squadron_motto TEXT;
+
+-- 2. Drop column motto
+ALTER TABLE Squadrons DROP COLUMN motto;
+
+-- 3. Modify squadron_number length
+ALTER TABLE Squadrons MODIFY squadron_number VARCHAR(20);
+
+-- 4. Add column active_status
+ALTER TABLE Squadrons ADD COLUMN active_status VARCHAR(50);
+
+-- 5. Add foreign key base_id to Bases
+ALTER TABLE Squadrons ADD CONSTRAINT fk_squad_base
+    FOREIGN KEY (base_id) REFERENCES Bases(base_id);
+
+-- Delete queries for Squadrons:
+-- 1. Delete squadrons with no aircraft assigned
+DELETE FROM Squadrons
+WHERE aircraft_count = 0;
+
+-- 2. Delete squadrons with 'Flying' in their name
+DELETE FROM Squadrons
+WHERE name LIKE '%Flying%';
+
+-- 3. Delete squadron by number
+DELETE FROM Squadrons
+WHERE squadron_number = 'INAS 321F';
+
+-- 4. Delete squadrons with role 'Jet Training'
+DELETE FROM Squadrons
+WHERE role = 'Jet Training';
+
+-- 5. Delete squadron with id 10
+DELETE FROM Squadrons
+WHERE squadron_id = 10;
+
+-- Update queries for Squadrons:
+-- 1. Update aircraft_count for 'The Black Panthers'
+UPDATE Squadrons
+SET aircraft_count = aircraft_count + 2
+WHERE name = 'The Black Panthers';
+
+-- 2. Update role of 'The White Tigers'
+UPDATE Squadrons
+SET role = 'Carrier Deck Reconnaissance'
+WHERE name = 'The White Tigers';
+
+-- 3. Set active_status to 'Inactive' for squadrons with 0 aircraft
+UPDATE Squadrons
+SET active_status = 'Inactive'
+WHERE aircraft_count = 0;
+
+-- 4. Change squadron_number format for 'INAS 321'
+UPDATE Squadrons
+SET squadron_number = REPLACE(squadron_number, 'INAS ', 'INAS')
+WHERE squadron_number LIKE 'INAS 321%';
+
+-- 5. Update specialization for 'The Cobras'
+UPDATE Squadrons
+SET specialization = 'SAR & Support'
+WHERE name = 'The Cobras';
+
+
+-- Table: Weapons
+-- 1. Select all anti-ship missiles
+SELECT * FROM Weapons
+WHERE weapon_type = 'Anti-Ship Missile';
+
+-- 2. Select weapon names with range > 200 km
+SELECT weapon_name, range_km FROM Weapons
+WHERE range_km > 200;
+
+-- 3. Count weapons by manufacturer
+SELECT manufacturer, COUNT(*) AS count_weapons FROM Weapons
+GROUP BY manufacturer;
+
+-- 4. Select weapons introduced before 1990
+SELECT weapon_name, introduction_year FROM Weapons
+WHERE introduction_year < 1990;
+
+-- 5. Select all nuclear-capable weapons
+SELECT weapon_name FROM Weapons
+WHERE warhead_type = 'Nuclear';
+
+-- Rename queries for Weapons:
+-- 1. Rename weapon_name to name
+ALTER TABLE Weapons RENAME COLUMN weapon_name TO name;
+
+-- 2. Rename weapon_type to type
+ALTER TABLE Weapons RENAME COLUMN weapon_type TO type;
+
+-- 3. Rename guidance to guidance_system
+ALTER TABLE Weapons RENAME COLUMN guidance TO guidance_system;
+
+-- 4. Rename warhead_type to warhead
+ALTER TABLE Weapons RENAME COLUMN warhead_type TO warhead;
+
+-- 5. Rename introduction_year to intro_year
+ALTER TABLE Weapons RENAME COLUMN introduction_year TO intro_year;
+
+-- Alter queries for Weapons:
+-- 1. Add column current_stock
+ALTER TABLE Weapons ADD COLUMN current_stock INT;
+
+-- 2. Drop column detection_features
+ALTER TABLE Weapons DROP COLUMN detection_features;
+
+-- 3. Modify origin length
+ALTER TABLE Weapons MODIFY origin VARCHAR(100);
+
+-- 4. Add column last_maintenance
+ALTER TABLE Weapons ADD COLUMN last_maintenance DATE;
+
+-- 5. Add UNIQUE constraint on name
+ALTER TABLE Weapons ADD UNIQUE (name);
+
+-- Delete queries for Weapons:
+-- 1. Delete weapons of category 'Consumables'
+DELETE FROM Weapons
+WHERE category = 'Consumables';
+
+-- 2. Delete all mines by type
+DELETE FROM Weapons
+WHERE type = 'Naval Mine';
+
+-- 3. Delete weapon by name 'Exocet SM39'
+DELETE FROM Weapons
+WHERE name = 'Exocet SM39';
+
+-- 4. Delete weapons introduced after 2020
+DELETE FROM Weapons
+WHERE intro_year > 2020;
+
+-- 5. Delete any weapon with range_km = 0
+DELETE FROM Weapons
+WHERE range_km = 0;
+
+-- Update queries for Weapons:
+-- 1. Update range of 'Harpoon Block II' to 300
+UPDATE Weapons
+SET range_km = 300
+WHERE name = 'Harpoon Block II';
+
+-- 2. Update designer for all Naval Mines
+UPDATE Weapons
+SET designer = 'Various'
+WHERE type = 'Naval Mine';
+
+-- 3. Set last_maintenance for 'Barak 8 Missile Canister' to today
+UPDATE Weapons
+SET last_maintenance = CURDATE()
+WHERE name LIKE 'Barak 8%';
+
+-- 4. Increase current_stock of all 'Spares' by 10%
+UPDATE Weapons
+SET current_stock = current_stock * 1.10
+WHERE category = 'Spares';
+
+-- 5. Change guidance_system of 'Sea Eagle' to 'Active Radar'
+UPDATE Weapons
+SET guidance_system = 'Active Radar'
+WHERE name = 'Sea Eagle';
+
+
+-- Table: Operations
+-- 1. Select all ongoing operations
+SELECT * FROM Operations
+WHERE status = 'Ongoing';
+
+-- 2. Select operations in 'Indian Ocean Region'
+SELECT operation_name, area_of_operation FROM Operations
+WHERE area_of_operation LIKE '%Indian Ocean Region%';
+
+-- 3. Count operations by type
+SELECT operation_type, COUNT(*) AS op_count FROM Operations
+GROUP BY operation_type;
+
+-- 4. Select operations started in 2023
+SELECT operation_name, start_date FROM Operations
+WHERE YEAR(start_date) = 2023;
+
+-- 5. Select names of completed operations with long objectives
+SELECT operation_name FROM Operations
+WHERE status = 'Completed' AND CHAR_LENGTH(objective) > 50;
+
+-- Rename queries for Operations:
+-- 1. Rename operation_name to name
+ALTER TABLE Operations RENAME COLUMN operation_name TO name;
+
+-- 2. Rename operation_type to type
+ALTER TABLE Operations RENAME COLUMN operation_type TO type;
+
+-- 3. Rename lead_command to command
+ALTER TABLE Operations RENAME COLUMN lead_command TO command;
+
+-- 4. Rename start_date to date_start
+ALTER TABLE Operations RENAME COLUMN start_date TO date_start;
+
+-- 5. Rename end_date to date_end
+ALTER TABLE Operations RENAME COLUMN end_date TO date_end;
+
+-- Alter queries for Operations:
+-- 1. Add column mission_commander_id
+ALTER TABLE Operations ADD COLUMN mission_commander_id INT;
+
+-- 2. (Skip dropping outcome to preserve data)
+-- 3. Modify area_of_operation length
+ALTER TABLE Operations MODIFY area_of_operation VARCHAR(500);
+
+-- 4. Add column success_metric
+ALTER TABLE Operations ADD COLUMN success_metric DECIMAL(5,2);
+
+-- 5. Add foreign key mission_commander_id to Personnel
+ALTER TABLE Operations ADD CONSTRAINT fk_op_commander
+    FOREIGN KEY (mission_commander_id) REFERENCES Personnel(personnel_id);
+
+-- Delete queries for Operations:
+-- 1. Delete cancelled operations
+DELETE FROM Operations
+WHERE status = 'Cancelled';
+
+-- 2. Delete operations with NULL end date and not Ongoing
+DELETE FROM Operations
+WHERE date_end IS NULL AND status <> 'Ongoing';
+
+-- 3. Delete operations before 2010
+DELETE FROM Operations
+WHERE date_start < '2010-01-01';
+
+-- 4. Delete operation named 'TROPEX 21'
+DELETE FROM Operations
+WHERE name = 'TROPEX 21';
+
+-- 5. Delete operations with 'research' in objective
+DELETE FROM Operations
+WHERE objective LIKE '%research%';
+
+-- Update queries for Operations:
+-- 1. Update status to 'Completed' for operations with past end date
+UPDATE Operations
+SET status = 'Completed'
+WHERE date_end < CURDATE();
+
+-- 2. Update command for 'Op Rahat' to 'Western'
+UPDATE Operations
+SET command = 'Western'
+WHERE name = 'Op Rahat';
+
+-- 3. Set success_metric for 'Malabar 2023'
+UPDATE Operations
+SET success_metric = 87.50
+WHERE name = 'Malabar 2023';
+
+-- 4. Extend end_date of 'Op Sankalp' by 30 days
+UPDATE Operations
+SET date_end = DATE_ADD(date_end, INTERVAL 30 DAY)
+WHERE name = 'Op Sankalp';
+
+-- 5. Clear outcome text for unspecified outcomes
+UPDATE Operations
+SET outcome = ''
+WHERE outcome IS NULL;
+
+
+-- Table: Maintenance_Schedule
+-- 1. Select all completed maintenance records
+SELECT * FROM Maintenance_Schedule
+WHERE status = 'Completed';
+
+-- 2. Select upcoming scheduled maintenance (status 'Scheduled')
+SELECT maint_id, asset_id, maintenance_type FROM Maintenance_Schedule
+WHERE status = 'Scheduled';
+
+-- 3. Count maintenance per status
+SELECT status, COUNT(*) AS count_ms FROM Maintenance_Schedule
+GROUP BY status;
+
+-- 4. Select maintenance for ships in 2025
+SELECT * FROM Maintenance_Schedule
+WHERE asset_type = 'Ship' AND YEAR(scheduled_start_date) = 2025;
+
+-- 5. Select records where actual_end_date > scheduled_end_date
+SELECT maint_id, asset_id FROM Maintenance_Schedule
+WHERE actual_end_date > scheduled_end_date;
+
+-- Rename queries for Maintenance_Schedule:
+-- 1. Rename maintenance_type to type
+ALTER TABLE Maintenance_Schedule RENAME COLUMN maintenance_type TO type;
+
+-- 2. Rename scheduled_start_date to sched_start
+ALTER TABLE Maintenance_Schedule RENAME COLUMN scheduled_start_date TO sched_start;
+
+-- 3. Rename scheduled_end_date to sched_end
+ALTER TABLE Maintenance_Schedule RENAME COLUMN scheduled_end_date TO sched_end;
+
+-- 4. Rename actual_start_date to actual_start
+ALTER TABLE Maintenance_Schedule RENAME COLUMN actual_start_date TO actual_start;
+
+-- 5. Rename actual_end_date to actual_end
+ALTER TABLE Maintenance_Schedule RENAME COLUMN actual_end_date TO actual_end;
+
+-- Alter queries for Maintenance_Schedule:
+-- 1. Add column delay_reason
+ALTER TABLE Maintenance_Schedule ADD COLUMN delay_reason VARCHAR(255);
+
+-- 2. Drop column performing_unit_id
+ALTER TABLE Maintenance_Schedule DROP COLUMN performing_unit_id;
+
+-- 3. Modify status length
+ALTER TABLE Maintenance_Schedule MODIFY status VARCHAR(20);
+
+-- 4. Add column inspector_id
+ALTER TABLE Maintenance_Schedule ADD COLUMN inspector_id INT;
+
+-- 5. (Skip adding FK for asset_id as it varies by asset_type)
+
+-- Delete queries for Maintenance_Schedule:
+-- 1. Delete maintenance records with status 'Delayed'
+DELETE FROM Maintenance_Schedule
+WHERE status = 'Delayed';
+
+-- 2. Delete old scheduled maintenance from 2020
+DELETE FROM Maintenance_Schedule
+WHERE sched_start < '2020-01-01';
+
+-- 3. Delete maintenance records for asset_id = 1
+DELETE FROM Maintenance_Schedule
+WHERE asset_id = 1;
+
+-- 4. Delete completed maintenance (with actual_end)
+DELETE FROM Maintenance_Schedule
+WHERE status = 'Completed' AND actual_end IS NOT NULL;
+
+-- 5. Delete scheduled maintenance never started
+DELETE FROM Maintenance_Schedule
+WHERE status = 'Scheduled' AND actual_start IS NULL;
+
+-- Update queries for Maintenance_Schedule:
+-- 1. Update status to 'Completed' where actual_end is set
+UPDATE Maintenance_Schedule
+SET status = 'Completed'
+WHERE actual_end IS NOT NULL;
+
+-- 2. Update delay_reason for a specific record
+UPDATE Maintenance_Schedule
+SET delay_reason = 'Parts delayed'
+WHERE maint_id = 2;
+
+-- 3. Move scheduled_end date by 10 days for a record
+UPDATE Maintenance_Schedule
+SET sched_end = DATE_ADD(sched_end, INTERVAL 10 DAY)
+WHERE maint_id = 5;
+
+-- 4. Mark maintenance as 'In Progress' if actual_start is set
+UPDATE Maintenance_Schedule
+SET status = 'In Progress'
+WHERE actual_start IS NOT NULL AND actual_end IS NULL;
+
+-- 5. Assign inspector_id to 99 for in-progress work
+UPDATE Maintenance_Schedule
+SET inspector_id = 99
+WHERE status = 'In Progress';
+
+
+-- Table: Training_Courses
+-- 1. Select all officer courses
+SELECT * FROM Training_Courses
+WHERE category = 'Officer';
+
+-- 2. Select courses longer than 40 weeks
+SELECT course_name, duration_weeks FROM Training_Courses
+WHERE duration_weeks > 40;
+
+-- 3. Count courses by category
+SELECT category, COUNT(*) AS num_courses FROM Training_Courses
+GROUP BY category;
+
+-- 4. Select courses offered at establishment 4
+SELECT course_name FROM Training_Courses
+WHERE training_establishment_id = 4;
+
+-- 5. Select courses with capacity >= 100
+SELECT course_name, course_capacity FROM Training_Courses
+WHERE course_capacity >= 100;
+
+-- Rename queries for Training_Courses:
+-- 1. Rename course_name to name
+ALTER TABLE Training_Courses RENAME COLUMN course_name TO name;
+
+-- 2. Rename course_code to code
+ALTER TABLE Training_Courses RENAME COLUMN course_code TO code;
+
+-- 3. Rename training_establishment_id to establishment_id
+ALTER TABLE Training_Courses RENAME COLUMN training_establishment_id TO establishment_id;
+
+-- 4. Rename duration_weeks to duration
+ALTER TABLE Training_Courses RENAME COLUMN duration_weeks TO duration;
+
+-- 5. Rename certification_awarded to certification
+ALTER TABLE Training_Courses RENAME COLUMN certification_awarded TO certification;
+
+-- Alter queries for Training_Courses:
+-- 1. Add column course_level
+ALTER TABLE Training_Courses ADD COLUMN course_level VARCHAR(50);
+
+-- 2. Drop column prerequisites
+ALTER TABLE Training_Courses DROP COLUMN prerequisites;
+
+-- 3. Modify course_capacity to SMALLINT
+ALTER TABLE Training_Courses MODIFY course_capacity SMALLINT;
+
+-- 4. Add column department
+ALTER TABLE Training_Courses ADD COLUMN department VARCHAR(100);
+
+-- 5. Add foreign key establishment_id to Bases
+ALTER TABLE Training_Courses ADD CONSTRAINT fk_course_base
+    FOREIGN KEY (establishment_id) REFERENCES Bases(base_id);
+
+-- Delete queries for Training_Courses:
+-- 1. Delete short courses (duration < 10 weeks)
+DELETE FROM Training_Courses
+WHERE duration < 10;
+
+-- 2. Delete all courses with capacity less than 25
+DELETE FROM Training_Courses
+WHERE course_capacity < 25;
+
+-- 3. Delete course by code 'NAOC'
+DELETE FROM Training_Courses
+WHERE code = 'NAOC';
+
+-- 4. Delete courses in category 'All' older programs
+DELETE FROM Training_Courses
+WHERE category = 'All';
+
+-- 5. Delete courses with NULL certification
+DELETE FROM Training_Courses
+WHERE certification IS NULL;
+
+-- Update queries for Training_Courses:
+-- 1. Update duration of 'Seaman I Course' to 26
+UPDATE Training_Courses
+SET duration = 26
+WHERE name = 'Seaman I Course';
+
+-- 2. Update category for 'Damage Control & Fire Fighting' to 'General'
+UPDATE Training_Courses
+SET category = 'General'
+WHERE name = 'Damage Control & Fire Fighting';
+
+-- 3. Set course_capacity to 200 for courses in establishment 9
+UPDATE Training_Courses
+SET course_capacity = 200
+WHERE establishment_id = 9;
+
+-- 4. Change department for 'Cyber Security Fundamentals' to 'CSE'
+UPDATE Training_Courses
+SET department = 'CSE'
+WHERE name = 'Cyber Security Fundamentals';
+
+-- 5. Update certification for 'Pilot Training - Fixed Wing'
+UPDATE Training_Courses
+SET certification = 'Fixed-Wing Wings'
+WHERE name = 'Pilot Training - Fixed Wing';
+
+
+-- Table: Personnel_Enlistment
+-- 1. Select all enlistments with grade 'A+'
+SELECT * FROM Personnel_Enlistment
+WHERE performance_grade = 'A+';
+
+-- 2. Select records with top performer flag
+SELECT * FROM Personnel_Enlistment
+WHERE is_top_performer = 1;
+
+-- 3. Count enrollments by rank_at_graduation
+SELECT rank_at_graduation, COUNT(*) AS count_enroll FROM Personnel_Enlistment
+GROUP BY rank_at_graduation;
+
+-- 4. Select enlistments for course_id 1
+SELECT * FROM Personnel_Enlistment
+WHERE course_id = 1;
+
+-- 5. Select personnel_id with final score above 90
+SELECT personnel_id FROM Personnel_Enlistment
+WHERE final_score > 90;
+
+-- Rename queries for Personnel_Enlistment:
+-- 1. Rename personnel_id to p_id
+ALTER TABLE Personnel_Enlistment RENAME COLUMN personnel_id TO p_id;
+
+-- 2. Rename course_id to c_id
+ALTER TABLE Personnel_Enlistment RENAME COLUMN course_id TO c_id;
+
+-- 3. Rename enrollment_date to enroll_date
+ALTER TABLE Personnel_Enlistment RENAME COLUMN enrollment_date TO enroll_date;
+
+-- 4. Rename graduation_date to grad_date
+ALTER TABLE Personnel_Enlistment RENAME COLUMN graduation_date TO grad_date;
+
+-- 5. Rename performance_grade to grade
+ALTER TABLE Personnel_Enlistment RENAME COLUMN performance_grade TO grade;
+
+-- Alter queries for Personnel_Enlistment:
+-- 1. Add column exam_center
+ALTER TABLE Personnel_Enlistment ADD COLUMN exam_center VARCHAR(100);
+
+-- 2. Drop column remarks
+ALTER TABLE Personnel_Enlistment DROP COLUMN remarks;
+
+-- 3. Modify final_score precision
+ALTER TABLE Personnel_Enlistment MODIFY final_score DECIMAL(6,2);
+
+-- 4. Add column training_branch
+ALTER TABLE Personnel_Enlistment ADD COLUMN training_branch VARCHAR(100);
+
+-- 5. Add foreign key for p_id to Personnel
+ALTER TABLE Personnel_Enlistment ADD CONSTRAINT fk_enl_person
+    FOREIGN KEY (p_id) REFERENCES Personnel(personnel_id);
+
+-- Delete queries for Personnel_Enlistment:
+-- 1. Delete enlistments with grade 'C'
+DELETE FROM Personnel_Enlistment
+WHERE grade = 'C';
+
+-- 2. Delete enlistments where final_score < 80
+DELETE FROM Personnel_Enlistment
+WHERE final_score < 80;
+
+-- 3. Delete enlistments for course 14
+DELETE FROM Personnel_Enlistment
+WHERE c_id = 14;
+
+-- 4. Delete top performers flag = false
+DELETE FROM Personnel_Enlistment
+WHERE is_top_performer = 0;
+
+-- 5. Delete enlistments before year 2000
+DELETE FROM Personnel_Enlistment
+WHERE enroll_date < '2000-01-01';
+
+-- Update queries for Personnel_Enlistment:
+-- 1. Update grade to 'A+' for final_score >= 95
+UPDATE Personnel_Enlistment
+SET grade = 'A+'
+WHERE final_score >= 95;
+
+-- 2. Update rank at graduation for personnel_id 4
+UPDATE Personnel_Enlistment
+SET rank_at_graduation = 'Lieutenant Commander'
+WHERE p_id = 4;
+
+-- 3. Set top performer for score above 90
+UPDATE Personnel_Enlistment
+SET is_top_performer = 1
+WHERE final_score > 90;
+
+-- 4. Change exam_center for course 2 to 'Delhi Center'
+UPDATE Personnel_Enlistment
+SET exam_center = 'Delhi Center'
+WHERE c_id = 2;
+
+-- 5. Update training_branch to 'Naval Operations' where course is 1
+UPDATE Personnel_Enlistment
+SET training_branch = 'Naval Operations'
+WHERE c_id = 1;
+
+
+-- Table: Medical_Records
+-- 1. Select all records with height > 180
+SELECT * FROM Medical_Records
+WHERE height_cm > 180;
+
+-- 2. Select records with allergies not null
+SELECT * FROM Medical_Records
+WHERE allergies <> 'None';
+
+-- 3. Count records by medical_category
+SELECT medical_category, COUNT(*) AS count_med FROM Medical_Records
+GROUP BY medical_category;
+
+-- 4. Select records with vision below 6/6 in any eye
+SELECT * FROM Medical_Records
+WHERE vision_l <> '6/6' OR vision_r <> '6/6';
+
+-- 5. Select records checked by doctor_id 103
+SELECT personnel_id, checkup_date FROM Medical_Records
+WHERE doctor_id = 103;
+
+-- Rename queries for Medical_Records:
+-- 1. Rename checkup_date to exam_date
+ALTER TABLE Medical_Records RENAME COLUMN checkup_date TO exam_date;
+
+-- 2. Rename medical_category to med_cat
+ALTER TABLE Medical_Records RENAME COLUMN medical_category TO med_cat;
+
+-- 3. Rename height_cm to height
+ALTER TABLE Medical_Records RENAME COLUMN height_cm TO height;
+
+-- 4. Rename weight_kg to weight
+ALTER TABLE Medical_Records RENAME COLUMN weight_kg TO weight;
+
+-- 5. Rename vision_l to vision_left
+ALTER TABLE Medical_Records RENAME COLUMN vision_l TO vision_left;
+
+-- Alter queries for Medical_Records:
+-- 1. Add column blood_pressure
+ALTER TABLE Medical_Records ADD COLUMN blood_pressure VARCHAR(10);
+
+-- 2. Drop column doctor_id (if no longer needed)
+ALTER TABLE Medical_Records DROP COLUMN doctor_id;
+
+-- 3. Modify remarks length
+ALTER TABLE Medical_Records MODIFY remarks VARCHAR(255);
+
+-- 4. Add column dental_check BOOLEAN
+ALTER TABLE Medical_Records ADD COLUMN dental_check BOOLEAN;
+
+-- 5. Add foreign key p_id to Personnel
+ALTER TABLE Medical_Records ADD CONSTRAINT fk_med_person
+    FOREIGN KEY (personnel_id) REFERENCES Personnel(personnel_id);
+
+-- Delete queries for Medical_Records:
+-- 1. Delete records with S2 category
+DELETE FROM Medical_Records
+WHERE med_cat = 'S2A1' OR med_cat LIKE 'S2%';
+
+-- 2. Delete records older than 2025-01-01
+DELETE FROM Medical_Records
+WHERE exam_date < '2025-01-01';
+
+-- 3. Delete records with weight over 90 kg
+DELETE FROM Medical_Records
+WHERE weight > 90;
+
+-- 4. Delete records with vision worse than 6/9
+DELETE FROM Medical_Records
+WHERE vision_left = '6/12' OR vision_r = '6/12';
+
+-- 5. Delete records with any allergy (not 'None')
+DELETE FROM Medical_Records
+WHERE allergies <> 'None';
+
+-- Update queries for Medical_Records:
+-- 1. Update remarks to 'Passed' for all 2025 checkups
+UPDATE Medical_Records
+SET remarks = 'Passed'
+WHERE YEAR(exam_date) = 2025;
+
+-- 2. Update height for personnel_id 10 to 172
+UPDATE Medical_Records
+SET height = 172
+WHERE personnel_id = 10;
+
+-- 3. Increment weight by 1 for records with blood_pressure set
+UPDATE Medical_Records
+SET weight = weight + 1
+WHERE blood_pressure IS NOT NULL;
+
+-- 4. Set dental_check TRUE for exams in 2024
+UPDATE Medical_Records
+SET dental_check = TRUE
+WHERE YEAR(exam_date) = 2024;
+
+-- 5. Add 'Requires Glasses' to remarks for vision <6/6
+UPDATE Medical_Records
+SET remarks = CONCAT(remarks, ' (Requires Glasses)')
+WHERE vision_left <> '6/6' OR vision_r <> '6/6';
+
+
+-- Table: Logistics_Supply
+-- 1. Select all fuel items
+SELECT * FROM Logistics_Supply
+WHERE item_category = 'Fuel';
+
+-- 2. Select supplies expiring in 2026
+SELECT item_name, expiry_date FROM Logistics_Supply
+WHERE YEAR(expiry_date) = 2026;
+
+-- 3. Count supplies by category
+SELECT item_category, COUNT(*) AS count_items FROM Logistics_Supply
+GROUP BY item_category;
+
+-- 4. Select supplies with quantity below 100
+SELECT * FROM Logistics_Supply
+WHERE quantity < 100;
+
+-- 5. Select last_order_date for item 'HSD Fuel'
+SELECT last_order_date FROM Logistics_Supply
+WHERE item_name = 'HSD Fuel';
+
+-- Rename queries for Logistics_Supply:
+-- 1. Rename item_name to name
+ALTER TABLE Logistics_Supply RENAME COLUMN item_name TO name;
+
+-- 2. Rename nato_stock_number to nsn
+ALTER TABLE Logistics_Supply RENAME COLUMN nato_stock_number TO nsn;
+
+-- 3. Rename storage_location_id to location_id
+ALTER TABLE Logistics_Supply RENAME COLUMN storage_location_id TO location_id;
+
+-- 4. Rename last_order_date to order_date
+ALTER TABLE Logistics_Supply RENAME COLUMN last_order_date TO order_date;
+
+-- 5. Rename unit_of_measure to unit
+ALTER TABLE Logistics_Supply RENAME COLUMN unit_of_measure TO unit;
+
+-- Alter queries for Logistics_Supply:
+-- 1. Add column reorder_level
+ALTER TABLE Logistics_Supply ADD COLUMN reorder_level INT;
+
+-- 2. Drop column expiry_date for non-expirable items
+ALTER TABLE Logistics_Supply DROP COLUMN expiry_date;
+
+-- 3. Modify supplier length
+ALTER TABLE Logistics_Supply MODIFY supplier VARCHAR(150);
+
+-- 4. Add column storage_condition
+ALTER TABLE Logistics_Supply ADD COLUMN storage_condition VARCHAR(100);
+
+-- 5. Add foreign key location_id to Bases
+ALTER TABLE Logistics_Supply ADD CONSTRAINT fk_supply_base
+    FOREIGN KEY (location_id) REFERENCES Bases(base_id);
+
+-- Delete queries for Logistics_Supply:
+-- 1. Delete all ammunition supplies
+DELETE FROM Logistics_Supply
+WHERE item_category = 'Ammunition';
+
+-- 2. Delete perishable rations expired
+DELETE FROM Logistics_Supply
+WHERE item_category = 'Rations' AND expiry_date < CURDATE();
+
+-- 3. Delete supply by NATO number
+DELETE FROM Logistics_Supply
+WHERE nsn = '9140-12-345-6789';
+
+-- 4. Delete consumables with zero stock
+DELETE FROM Logistics_Supply
+WHERE quantity = 0;
+
+-- 5. Delete fuel items with 'ATF' in name
+DELETE FROM Logistics_Supply
+WHERE name LIKE '%ATF%';
+
+-- Update queries for Logistics_Supply:
+-- 1. Update quantity of 'HSD Fuel' by adding 100000
+UPDATE Logistics_Supply
+SET quantity = quantity + 100000
+WHERE name = 'HSD Fuel';
+
+-- 2. Update supplier to 'Local Vendor' for all Vegetables
+UPDATE Logistics_Supply
+SET supplier = 'Local Vendor'
+WHERE name LIKE '%Vegetables%';
+
+-- 3. Set storage_condition to 'Cold Storage' for medical kits
+UPDATE Logistics_Supply
+SET storage_condition = 'Cold Storage'
+WHERE item_category = 'Medical';
+
+-- 4. Increase quantity of 'Engine Lubricating Oil' by 20000
+UPDATE Logistics_Supply
+SET quantity = quantity + 20000
+WHERE name = 'Engine Lubricating Oil';
+
+-- 5. Change item_category 'Consumables' to 'Utilities'
+UPDATE Logistics_Supply
+SET item_category = 'Utilities'
+WHERE item_category = 'Consumables';
+
+
+-- Table: Communication_Logs
+-- 1. Select all logs of type 'Voice'
+SELECT * FROM Communication_Logs
+WHERE mode = 'Voice';
+
+-- 2. Select logs between Ship 1 and Base 2
+SELECT * FROM Communication_Logs
+WHERE source_unit_id = 1 AND destination_unit_id = 2;
+
+-- 3. Count logs by classification
+SELECT classification, COUNT(*) AS count_logs FROM Communication_Logs
+GROUP BY classification;
+
+-- 4. Select logs after July 25, 2025
+SELECT * FROM Communication_Logs
+WHERE log_timestamp >= '2025-07-25';
+
+-- 5. Select distinct source_unit_type in logs
+SELECT DISTINCT source_unit_type FROM Communication_Logs;
+
+-- Rename queries for Communication_Logs:
+-- 1. Rename source_unit_type to src_type
+ALTER TABLE Communication_Logs RENAME COLUMN source_unit_type TO src_type;
+
+-- 2. Rename destination_unit_type to dest_type
+ALTER TABLE Communication_Logs RENAME COLUMN destination_unit_type TO dest_type;
+
+-- 3. Rename log_timestamp to ts
+ALTER TABLE Communication_Logs RENAME COLUMN log_timestamp TO ts;
+
+-- 4. Rename frequency_mhz to frequency
+ALTER TABLE Communication_Logs RENAME COLUMN frequency_mhz TO frequency;
+
+-- 5. Rename summary to notes
+ALTER TABLE Communication_Logs RENAME COLUMN summary TO notes;
+
+-- Alter queries for Communication_Logs:
+-- 1. Add column comm_duration
+ALTER TABLE Communication_Logs ADD COLUMN comm_duration INT;
+
+-- 2. Drop column classification (if needed)
+ALTER TABLE Communication_Logs DROP COLUMN classification;
+
+-- 3. Modify mode length
+ALTER TABLE Communication_Logs MODIFY mode VARCHAR(20);
+
+-- 4. Add column encryption_used BOOLEAN
+ALTER TABLE Communication_Logs ADD COLUMN encryption_used BOOLEAN;
+
+-- 5. (No suitable FK to add here)
+
+-- Delete queries for Communication_Logs:
+-- 1. Delete logs of 'Unclassified' messages
+DELETE FROM Communication_Logs
+WHERE classification = 'Unclassified';
+
+-- 2. Delete logs older than July 1, 2025
+DELETE FROM Communication_Logs
+WHERE ts < '2025-07-01';
+
+-- 3. Delete logs between Squadron 4 and Base 7
+DELETE FROM Communication_Logs
+WHERE source_unit_type = 'Squadron' AND source_unit_id = 4
+  AND dest_unit_type = 'Base' AND dest_unit_id = 7;
+
+-- 4. Delete 'Secret' logs of 'SATCOM' mode
+DELETE FROM Communication_Logs
+WHERE classification = 'Secret' AND mode = 'SATCOM';
+
+-- 5. Delete logs with missing frequency
+DELETE FROM Communication_Logs
+WHERE frequency IS NULL;
+
+-- Update queries for Communication_Logs:
+-- 1. Update mode to 'Encrypted Data' if encryption_used is true
+UPDATE Communication_Logs
+SET mode = 'Encrypted Data'
+WHERE encryption_used = TRUE;
+
+-- 2. Set encryption_used for all 'Secret' logs
+UPDATE Communication_Logs
+SET encryption_used = TRUE
+WHERE classification = 'Secret';
+
+-- 3. Assign duration 5 minutes for voice messages
+UPDATE Communication_Logs
+SET comm_duration = 5
+WHERE mode = 'Voice';
+
+-- 4. Change dest_type 'Ship' to 'Vessel'
+UPDATE Communication_Logs
+SET dest_type = 'Vessel'
+WHERE dest_unit_type = 'Ship';
+
+-- 5. Add notes for periodic reports
+UPDATE Communication_Logs
+SET notes = CONCAT(notes, ' (Periodic Report)')
+WHERE notes LIKE '%position and status%' 
