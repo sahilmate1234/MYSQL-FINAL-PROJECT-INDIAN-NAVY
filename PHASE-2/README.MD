@@ -92,4 +92,58 @@ ADD COLUMN last_maintenance DATE;
 ALTER TABLE Aircraft
 RENAME COLUMN tail_number TO tail_no;
 
+📈 Project Highlights
 
+Phase 2 expands upon Phase 1 by introducing:
+
+Column modifications and renaming
+
+Deletion of legacy data
+
+Updates to real-time values
+
+Enhanced inter-table integrity
+
+Focused on real-world naval operations simulation through SQL.
+
+Includes advanced normalization and schema optimization.
+
+⚙️ Tools & Environment
+Tool	Purpose
+MySQL / MariaDB	Database management system
+MySQL Workbench / VS Code	Query execution and schema design
+GitHub	Version control & documentation
+Markdown (.md)	README project documentation
+🪖 Use Cases
+
+Tracking naval personnel across bases and ships
+
+Monitoring ship maintenance and readiness
+
+Managing training enrollments and course statistics
+
+Logging communication between ships, aircraft, and bases
+
+Analyzing weapon stock, operations success, and supply flow
+
+📦 Project Deliverables
+File Name	Description
+PROJECT PHASE - 2 SAHIL MATE INDIAN NAVY DATABASE.sql	Complete SQL script with all queries and operations
+README.md	Project documentation for GitHub
+Phase-1.sql (optional)	Base schema creation (from earlier phase)
+👨‍💻 Author
+
+Sahil Mate
+📘 DBMS Advanced SQL Project – Indian Navy Database (Phase 2)
+🏫 [Your College Name]
+📧 [Your Email Address]
+
+🏅 Acknowledgment
+
+Special thanks to the DBMS Faculty and Department of Computer Science
+for guidance in creating a practical SQL implementation reflecting real-world defense data systems.
+
+🧾 License
+
+This project is developed for academic and educational purposes only.
+Unauthorized use or commercial redistribution is not permitted.
