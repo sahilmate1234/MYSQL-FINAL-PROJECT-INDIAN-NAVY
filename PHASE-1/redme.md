@@ -88,3 +88,62 @@ SELECT asset_type, maintenance_type, status
 FROM Maintenance_Schedule
 WHERE status = 'In Progress';
 
+🧠 Concepts Demonstrated
+
+Database Design & Normalization
+
+Primary & Foreign Key Relationships
+
+Referential Integrity
+
+Joins (INNER, LEFT, RIGHT)
+
+Aggregate Functions & Clauses
+
+Subqueries & Nested Queries
+
+Data Definition Language (DDL)
+
+Data Manipulation Language (DML)
+
+Data Query Language (DQL)
+
+Safe Updates & Cascading Constraints
+
+📈 Real-Life Applications
+
+Naval personnel and ship record management
+
+Fleet and base coordination
+
+Maintenance and operations scheduling
+
+Logistics and inventory control
+
+Training and medical administration
+
+🏁 Project Output
+
+Database File: PROJECT PHASE -1 SAHIL MATE INDIAN NAVY.sql
+
+Total Tables: 13
+
+Total Records: 200+
+
+Queries: 100+ (DDL, DML, DQL, JOINs, Subqueries, Functions)
+
+👨‍💻 Author
+
+Sahil Mate
+📚 DBMS Project | Indian Navy SQL Database
+🏫 [Your Institution Name]
+📧 [Your Email Address]
+
+🏅 Acknowledgment
+
+Special thanks to the Department of Computer Science and DBMS Faculty for guidance in developing this real-world SQL implementation.
+
+📎 License
+
+This project is created for academic and educational purposes only.
+Unauthorized duplication or redistribution is prohibited.
