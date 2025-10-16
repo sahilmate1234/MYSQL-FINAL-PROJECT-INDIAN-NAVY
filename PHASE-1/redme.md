@@ -1,149 +1,106 @@
-# ⚓ Indian Navy SQL Database System
-### 🚀 DBMS Final Project by *Sahil Mate*
+🇮🇳 Indian Navy Database Management System
+Project Phase 1 – SQL Implementation
+📘 Overview
 
----
+This project represents the Phase 1 of the Indian Navy Database Management System, designed to manage and organize comprehensive data related to naval personnel, ships, aircraft, bases, training, logistics, and operations.
+It serves as a foundational database model for efficient data storage, retrieval, and analysis using MySQL.
 
-## 🧭 Overview
-The **Indian Navy SQL Database System** is a comprehensive relational database project designed to model and manage various real-world operations of the Indian Navy.  
-It covers personnel management, ships and aircraft tracking, logistics, training programs, operations, medical records, and maintenance scheduling — all within a robust SQL-based framework.
+🧩 Key Objectives
 
-This project demonstrates advanced **Database Management System (DBMS)** concepts including:
-- Data normalization
-- Primary & foreign key constraints
-- Data integrity
-- Relational joins
-- Real-world SQL operations (DDL, DML, DQL)
-- Advanced querying and data analysis
+Design a relational database for the Indian Navy.
 
----
+Include minimum 10+ tables with relevant attributes.
 
-## 🧩 Project Objectives
-- To design a **realistic defense-grade naval database** using MySQL.
-- To implement **data relationships and constraints** across multiple entities.
-- To perform **real-life analytical queries** for operational insights.
-- To showcase full coverage of **DBMS commands** including CREATE, INSERT, UPDATE, DELETE, ALTER, DROP, and TRUNCATE.
+Demonstrate SQL operations:
 
----
+CREATE, INSERT, SELECT, TRUNCATE, and DROP.
 
-## 🏗️ Database Structure
+Maintain data consistency, integrity, and referential relationships through primary and foreign keys.
 
-### 📘 Database Name
-`indian_navy`
+🗃️ Database Details
 
-### 📊 Tables (13 Total)
-| No. | Table Name | Description |
-|-----|-------------|-------------|
-| 1 | `Personnel` | Stores data of all naval officers and sailors. |
-| 2 | `Ships` | Contains detailed information about naval ships. |
-| 3 | `Bases` | Stores geographical and logistical info on naval bases. |
-| 4 | `Aircraft` | Maintains details of all aircraft in the Navy. |
-| 5 | `Squadrons` | Details of naval air squadrons and their roles. |
-| 6 | `Weapons` | Catalog of all weapon systems used by the Navy. |
-| 7 | `Operations` | Records of missions, exercises, and naval operations. |
-| 8 | `Maintenance_Schedule` | Logs for ships, aircraft, and equipment maintenance. |
-| 9 | `Training_Courses` | Information about training programs and academies. |
-| 10 | `Personnel_Enlistment` | Tracks personnel training enrollment and performance. |
-| 11 | `Medical_Records` | Health and medical data of naval personnel. |
-| 12 | `Logistics_Supply` | Inventory management for fuel, ammo, rations, and spares. |
-| 13 | `Communication_Logs` | Secure logs of naval communications. |
+Database Name: indian_navy
 
----
+Major Tables:
+Table No.	Table Name	Description
+1	Personnel	Stores details of all naval personnel including rank, service number, and contact info.
+2	Ships	Contains data of naval ships (class, type, commission date, status).
+3	Bases	Information on naval bases, air stations, and dockyards.
+4	Aircraft	Details of naval aircraft, including type, base, and maintenance status.
+5	Squadrons	Information about various naval air squadrons and their commanding officers.
+6	Weapons	Inventory and specifications of weapon systems.
+7	Operations	Logs of naval operations, exercises, and humanitarian missions.
+8	Maintenance_Schedule	Tracks maintenance and refit activities for ships and aircraft.
+9	Training_Courses	Stores information about training programs for officers and sailors.
+10	Personnel_Enlistment	Maps personnel to training courses and their performance outcomes.
+11	Medical_Records	Health checkup details of personnel.
+12	Logistics_Supply	Manages logistics, inventory, and supply chain details.
+13	Communication_Logs	Tracks inter-unit communications and secure message transmissions.
+⚙️ SQL Functionalities Used
+1️⃣ CREATE TABLE
 
-## 🧱 Key Features
-✅ 13 relational tables with **real-world attributes and constraints**  
-✅ 200+ **INSERT statements** with realistic sample data  
-✅ Implementation of **Primary, Foreign Keys, and Integrity Constraints**  
-✅ 100+ **Operational SQL Queries**:
-- SELECT with WHERE, GROUP BY, HAVING, and JOINS  
-- UPDATE, DELETE, and ALTER operations  
-- DDL, DML, and DQL statements  
-✅ Supports **real-time naval scenarios** like fleet exercises, base logistics, personnel management, and maintenance tracking.  
+Used to define schema for all 13 tables with data types, constraints, and primary/foreign keys.
 
----
+2️⃣ INSERT INTO
 
-## 🛠️ Technologies Used
-- **Database:** MySQL  
-- **Query Language:** SQL  
-- **Tools:** MySQL Workbench / phpMyAdmin / VS Code  
-- **Documentation:** Markdown / PDF  
+Populates each table with realistic and representative sample data for demonstration.
 
----
+3️⃣ SELECT
 
-## 🔍 Sample Operations
-```sql
--- Display all active ships
-SELECT ship_name, ship_type, commission_date
-FROM Ships
-WHERE current_status = 'Active';
+Retrieves and displays data from tables using queries like:
 
--- Find personnel trained in Anti-Submarine Warfare
-SELECT p.full_name, t.course_name
-FROM Personnel p
-JOIN Personnel_Enlistment e ON p.personnel_id = e.personnel_id
-JOIN Training_Courses t ON e.course_id = t.course_id
-WHERE t.course_name LIKE '%Submarine%';
+SELECT * FROM Personnel;
 
--- Show all ongoing maintenance schedules
-SELECT asset_type, maintenance_type, status
-FROM Maintenance_Schedule
-WHERE status = 'In Progress';
+4️⃣ TRUNCATE
 
-🧠 Concepts Demonstrated
+Removes all rows while retaining the table structure:
 
-Database Design & Normalization
+TRUNCATE TABLE Ships;
 
-Primary & Foreign Key Relationships
+5️⃣ DROP
 
-Referential Integrity
+Deletes entire tables after testing:
 
-Joins (INNER, LEFT, RIGHT)
+DROP TABLE Bases;
 
-Aggregate Functions & Clauses
+🧠 Concept Highlights
 
-Subqueries & Nested Queries
+Normalization: Ensures minimal redundancy and better efficiency.
 
-Data Definition Language (DDL)
+Primary & Foreign Keys: Maintain relational integrity across interconnected tables.
 
-Data Manipulation Language (DML)
+Domain Coverage: Includes personnel, operations, logistics, and training—reflecting real naval functions.
 
-Data Query Language (DQL)
+Scalability: The schema can be extended for analytics, dashboards, or operational monitoring.
 
-Safe Updates & Cascading Constraints
+🧪 Tools & Technologies
 
-📈 Real-Life Applications
+Database: MySQL / MariaDB
 
-Naval personnel and ship record management
+Query Language: SQL
 
-Fleet and base coordination
+Editor: MySQL Workbench / phpMyAdmin / VS Code (with SQL extension)
 
-Maintenance and operations scheduling
+📂 File Included
 
-Logistics and inventory control
+PROJECT PHASE -1 SAHIL MATE INDIAN NAVY.sql
 
-Training and medical administration
+Contains all SQL scripts for creating, inserting, selecting, truncating, and dropping tables.
 
-🏁 Project Output
+📈 Future Scope (For Phase 2 & Beyond)
 
-Database File: PROJECT PHASE -1 SAHIL MATE INDIAN NAVY.sql
+Implement foreign key relationships more deeply.
 
-Total Tables: 13
+Develop views, joins, and stored procedures for analysis.
 
-Total Records: 200+
+Integrate with a frontend interface for data visualization.
 
-Queries: 100+ (DDL, DML, DQL, JOINs, Subqueries, Functions)
+Add user authentication and security roles.
 
 👨‍💻 Author
 
-Sahil Mate
-📚 DBMS Project | Indian Navy SQL Database
-🏫 [Your Institution Name]
-📧 [Your Email Address]
-
-🏅 Acknowledgment
-
-Special thanks to the Department of Computer Science and DBMS Faculty for guidance in developing this real-world SQL implementation.
-
-📎 License
-
-This project is created for academic and educational purposes only.
-Unauthorized duplication or redistribution is prohibited.
+Name: Sahil Mate
+Project: Database – Indian Navy
+Phase: 1
+Institution: (Add your college/university name here)
+Mentor/Instructor: (Add instructor name if applicable)
